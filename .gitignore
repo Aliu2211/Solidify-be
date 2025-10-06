@@ -1,0 +1,210 @@
+# ========================================
+# SOLIDIFY BACKEND - GIT IGNORE
+# ========================================
+
+# ========================================
+# Project Documentation & Temporary Files
+# ========================================
+ADS22B00263Y_CapstoneC1C2v2.docx
+extracted_text.txt
+temp_document.xml
+extract_docx.ps1
+nul
+
+# UI Design files (keep locally, don't push)
+UI Designs/
+
+# ========================================
+# Environment Variables & Secrets
+# ========================================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.env
+
+# ========================================
+# Node.js Dependencies
+# ========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ========================================
+# Package Manager Files
+# ========================================
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ========================================
+# Logs
+# ========================================
+logs/
+*.log
+npm-debug.log*
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ========================================
+# Runtime & Build
+# ========================================
+lib-cov
+coverage/
+*.lcov
+.nyc_output
+.grunt
+bower_components
+.lock-wscript
+build/Release
+dist/
+build/
+
+# ========================================
+# Testing
+# ========================================
+.coverage
+.coverage.*
+coverage/
+*.cover
+.hypothesis/
+.pytest_cache/
+.tox/
+
+# ========================================
+# IDEs & Editors
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# ========================================
+# Operating System Files
+# ========================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ========================================
+# Uploads & User Generated Content
+# ========================================
+uploads/
+public/uploads/
+temp/
+tmp/
+
+# ========================================
+# Database
+# ========================================
+*.sqlite
+*.sqlite3
+*.db
+data/
+mongodb-data/
+
+# ========================================
+# SSL Certificates
+# ========================================
+*.pem
+*.key
+*.cert
+*.crt
+ssl/
+
+# ========================================
+# Optional npm cache directory
+# ========================================
+.npm
+
+# ========================================
+# Optional eslint cache
+# ========================================
+.eslintcache
+
+# ========================================
+# TypeScript
+# ========================================
+*.tsbuildinfo
+.tscache/
+
+# ========================================
+# Serverless
+# ========================================
+.serverless/
+.webpack/
+
+# ========================================
+# Docker
+# ========================================
+docker-compose.override.yml
+.dockerignore
+
+# ========================================
+# Misc
+# ========================================
+.cache
+.parcel-cache
+.next
+.nuxt
+.vuepress/dist
+.docusaurus
+.serverless
+.fusebox
+.dynamodb
+.tern-port
+.vscode-test
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ========================================
+# Keep These Files
+# ========================================
+!.gitkeep
+!.env.example
