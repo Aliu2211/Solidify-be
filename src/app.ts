@@ -9,6 +9,7 @@ import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
 import config from './config/environment';
 import { swaggerSpec } from './config/swagger';
+import { customSwaggerCSS, customSwaggerHTML } from './config/swagger-theme';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import logger from './utils/logger';
@@ -68,8 +69,21 @@ app.get('/health', (_req: Request, res: Response) => {
 
 // Swagger Documentation
 app.use('/api-docs', swaggerUi.serve as any, swaggerUi.setup(swaggerSpec, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Solidify API Documentation',
+  customCss: customSwaggerCSS,
+  customSiteTitle: '🌱 Solidify API - Carbon Management Platform',
+  customfavIcon: 'https://cdn-icons-png.flaticon.com/512/3065/3065363.png',
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    filter: true,
+    syntaxHighlight: {
+      theme: 'monokai'
+    },
+    tryItOutEnabled: true,
+    docExpansion: 'none',
+    defaultModelsExpandDepth: 3,
+    defaultModelExpandDepth: 3,
+  },
 }) as any);
 
 // Swagger JSON endpoint

@@ -163,4 +163,15 @@ export class AuthController {
 
     return ApiResponseUtil.success(res, 'User retrieved successfully', Helpers.sanitizeUser(user));
   });
+
+  /**
+   * Get all organizations
+   */
+  static getOrganizations = asyncHandler(async (_req: AuthRequest, res: Response) => {
+    const Organization = (await import('../models/Organization')).default;
+
+    const organizations = await Organization.find({ isActive: true }).select('_id orgId name industry size location');
+
+    return ApiResponseUtil.success(res, 'Organizations retrieved successfully', organizations);
+  });
 }
