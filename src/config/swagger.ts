@@ -20,6 +20,17 @@ const swaggerDefinition = {
       - 🎯 3-Level Sustainability System (Foundation, Efficiency, Transformation)
       - 🏢 Multi-organization Support
 
+      **Getting Started:**
+      1. **Login:** Use credentials: \`admin@solidify.com\` / \`Admin1234\`
+      2. **Authorize:** Copy ONLY the accessToken (without "Bearer") and click "Authorize" 🔓 button above
+      3. **Paste Token:** In the dialog, just paste the token - Swagger adds "Bearer" automatically
+      4. **Get Organizations:** Use \`GET /organizations\` or \`GET /auth/organizations\` to see available orgs
+      5. **Create/Register:** Now you can create new organizations or register new users
+
+      **Available Organizations (from seed data):**
+      - Electroland Ghana Ltd: \`68e4fddf48b66e92d9ef1f88\`
+      - Hisense Ghana: \`68e4fddf48b66e92d9ef1f89\`
+
       **Author:** Jehiel Britstot Houmanou (BSc Capstone Project - June 2025)
     `,
     contact: {
@@ -47,7 +58,7 @@ const swaggerDefinition = {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        description: 'Enter your JWT token in the format: Bearer <token>',
+        description: 'Just paste your access token (WITHOUT "Bearer" prefix - Swagger adds it automatically)',
       },
     },
     schemas: {
@@ -132,30 +143,55 @@ const swaggerDefinition = {
           _id: {
             type: 'string',
           },
-          orgId: {
-            type: 'string',
-            example: 'ORG001',
-          },
           name: {
             type: 'string',
             example: 'Eco Solutions Ghana',
           },
-          industry: {
+          industryType: {
             type: 'string',
             example: 'Manufacturing',
           },
           size: {
             type: 'string',
-            enum: ['1-10', '11-50', '51-200', '201-500', '500+'],
-            example: '11-50',
+            enum: ['small', 'medium'],
+            example: 'medium',
           },
           location: {
-            type: 'object',
-            properties: {
-              city: { type: 'string', example: 'Accra' },
-              region: { type: 'string', example: 'Greater Accra' },
-              country: { type: 'string', example: 'Ghana' },
-            },
+            type: 'string',
+            example: 'Accra, Greater Accra, Ghana',
+          },
+          registrationNumber: {
+            type: 'string',
+            example: 'GH-123456789',
+          },
+          description: {
+            type: 'string',
+            nullable: true,
+          },
+          website: {
+            type: 'string',
+            nullable: true,
+          },
+          logoUrl: {
+            type: 'string',
+            nullable: true,
+          },
+          sustainabilityLevel: {
+            type: 'number',
+            enum: [1, 2, 3],
+            example: 1,
+          },
+          verified: {
+            type: 'boolean',
+            example: false,
+          },
+          createdAt: {
+            type: 'string',
+            format: 'date-time',
+          },
+          updatedAt: {
+            type: 'string',
+            format: 'date-time',
           },
         },
       },
@@ -202,22 +238,87 @@ const swaggerDefinition = {
           },
         },
       },
+      Conversation: {
+        type: 'object',
+        properties: {
+          _id: {
+            type: 'string',
+          },
+          type: {
+            type: 'string',
+            enum: ['direct', 'group'],
+            example: 'direct',
+          },
+          name: {
+            type: 'string',
+            nullable: true,
+            example: 'Project Discussion',
+          },
+          participants: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                user: {
+                  type: 'object',
+                  properties: {
+                    _id: { type: 'string' },
+                    firstName: { type: 'string' },
+                    lastName: { type: 'string' },
+                    avatarUrl: { type: 'string', nullable: true },
+                  },
+                },
+                joinedAt: {
+                  type: 'string',
+                  format: 'date-time',
+                },
+                lastReadAt: {
+                  type: 'string',
+                  format: 'date-time',
+                  nullable: true,
+                },
+                isActive: {
+                  type: 'boolean',
+                },
+              },
+            },
+          },
+          lastMessage: {
+            type: 'object',
+            nullable: true,
+            properties: {
+              content: { type: 'string' },
+              sender: { type: 'string' },
+              timestamp: { type: 'string', format: 'date-time' },
+            },
+          },
+          createdAt: {
+            type: 'string',
+            format: 'date-time',
+          },
+          updatedAt: {
+            type: 'string',
+            format: 'date-time',
+          },
+        },
+      },
       Message: {
         type: 'object',
         properties: {
           _id: {
             type: 'string',
           },
-          room: {
+          conversation: {
             type: 'string',
+            description: 'Conversation ID',
           },
           sender: {
             type: 'object',
             properties: {
               _id: { type: 'string' },
-              userId: { type: 'string' },
               firstName: { type: 'string' },
               lastName: { type: 'string' },
+              avatarUrl: { type: 'string', nullable: true },
             },
           },
           content: {
@@ -229,18 +330,23 @@ const swaggerDefinition = {
             enum: ['text', 'file', 'image'],
             example: 'text',
           },
-          attachments: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                url: { type: 'string' },
-                fileType: { type: 'string' },
-                fileName: { type: 'string' },
-              },
-            },
+          fileUrl: {
+            type: 'string',
+            nullable: true,
+          },
+          fileName: {
+            type: 'string',
+            nullable: true,
+          },
+          isDeleted: {
+            type: 'boolean',
+            default: false,
           },
           createdAt: {
+            type: 'string',
+            format: 'date-time',
+          },
+          updatedAt: {
             type: 'string',
             format: 'date-time',
           },
@@ -337,6 +443,10 @@ const swaggerDefinition = {
     {
       name: 'Authentication',
       description: 'User authentication and authorization endpoints',
+    },
+    {
+      name: 'Organizations',
+      description: 'Organization management and CRUD operations',
     },
     {
       name: 'Carbon Tracking',

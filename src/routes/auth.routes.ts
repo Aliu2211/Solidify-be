@@ -23,7 +23,7 @@ const router = Router();
  *               - password
  *               - firstName
  *               - lastName
- *               - organization
+ *               - organizationId
  *             properties:
  *               email:
  *                 type: string
@@ -39,10 +39,10 @@ const router = Router();
  *               lastName:
  *                 type: string
  *                 example: Doe
- *               organization:
+ *               organizationId:
  *                 type: string
- *                 description: Organization ID
- *                 example: 507f1f77bcf86cd799439011
+ *                 description: Organization ID (use actual ID from seeded database - see instructions below)
+ *                 example: 68e4fddf48b66e92d9ef1f88
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -91,12 +91,12 @@ router.post('/register', registerValidator, validate, AuthController.register);
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - identifier
  *               - password
  *             properties:
- *               email:
+ *               identifier:
  *                 type: string
- *                 format: email
+ *                 description: Email address or User ID
  *                 example: admin@solidify.com
  *               password:
  *                 type: string
@@ -232,5 +232,29 @@ router.put('/change-password', authenticate, changePasswordValidator, validate, 
  *         description: Unauthorized
  */
 router.get('/me', authenticate, AuthController.getCurrentUser);
+
+/**
+ * @swagger
+ * /auth/organizations:
+ *   get:
+ *     summary: Get list of all organizations (for registration)
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: List of available organizations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Organization'
+ */
+router.get('/organizations', AuthController.getOrganizations);
 
 export default router;
