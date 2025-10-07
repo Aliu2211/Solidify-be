@@ -22,7 +22,7 @@ const emissionFactorSchema = new Schema<IEmissionFactor>(
     factorValue: {
       type: Number,
       required: [true, 'Factor value is required'],
-      min: [0, 'Factor value must be positive'],
+      // Negative values allowed for carbon offsets
     },
     unit: {
       type: String,
