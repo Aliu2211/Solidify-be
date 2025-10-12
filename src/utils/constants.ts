@@ -38,9 +38,11 @@ export const CONTENT_STATUS = {
 } as const;
 
 export const NEWS_CATEGORIES = {
-  GLOBAL: 'Global',
-  REGIONAL: 'Regional',
-  INDUSTRY: 'Industry',
+  POLICY: 'policy',
+  TECHNOLOGY: 'technology',
+  SUCCESS_STORIES: 'success-stories',
+  EVENTS: 'events',
+  GLOBAL_TRENDS: 'global-trends',
 } as const;
 
 export const CARBON_ENTRY_TYPES = {

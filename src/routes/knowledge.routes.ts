@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { KnowledgeController } from '../controllers/knowledge.controller';
 import { authenticate, adminOrManager } from '../middleware/auth.middleware';
+import { createArticleValidator } from '../validators/knowledge.validator';
+import { validate } from '../middleware/validate.middleware';
 
 const router = Router();
 
@@ -137,8 +139,8 @@ router.get('/search', KnowledgeController.searchArticles);
  *             required:
  *               - title
  *               - content
+ *               - summary
  *               - category
- *               - level
  *             properties:
  *               title:
  *                 type: string
@@ -146,19 +148,33 @@ router.get('/search', KnowledgeController.searchArticles);
  *               content:
  *                 type: string
  *                 example: Detailed content about emission scopes...
+ *               summary:
+ *                 type: string
+ *                 maxLength: 500
+ *                 example: A comprehensive guide to understanding the three scopes of carbon emissions
  *               category:
  *                 type: string
  *                 enum: [carbon-tracking, regulations, best-practices, case-studies, tools]
  *                 example: carbon-tracking
+ *               sustainabilityLevel:
+ *                 type: number
+ *                 enum: [1, 2, 3]
+ *                 description: Sustainability level (1=foundation, 2=efficiency, 3=transformation)
+ *                 example: 1
  *               level:
  *                 type: string
  *                 enum: [foundation, efficiency, transformation]
+ *                 description: Alternative to sustainabilityLevel (will be converted to number)
  *                 example: foundation
  *               tags:
  *                 type: array
  *                 items:
  *                   type: string
  *                 example: ["emissions", "carbon", "basics"]
+ *               featured:
+ *                 type: boolean
+ *                 default: false
+ *                 example: false
  *     responses:
  *       201:
  *         description: Article created successfully
@@ -167,6 +183,6 @@ router.get('/search', KnowledgeController.searchArticles);
  *             schema:
  *               $ref: '#/components/schemas/KnowledgeArticle'
  */
-router.post('/articles', authenticate, adminOrManager, KnowledgeController.createArticle);
+router.post('/articles', authenticate, adminOrManager, createArticleValidator, validate, KnowledgeController.createArticle);
 
 export default router;
