@@ -243,16 +243,30 @@ const swaggerDefinition = {
         properties: {
           _id: {
             type: 'string',
+            example: '68e51c2a9561b12c3ecdbba0',
+          },
+          conversationId: {
+            type: 'string',
+            example: 'CONV000001',
+            description: 'Unique conversation identifier',
           },
           type: {
             type: 'string',
             enum: ['direct', 'group'],
             example: 'direct',
+            description: 'Conversation type',
           },
           name: {
             type: 'string',
             nullable: true,
-            example: 'Project Discussion',
+            example: 'Carbon Reduction Partnership',
+            description: 'Optional conversation name (recommended for groups)',
+          },
+          organizations: {
+            type: 'array',
+            items: { type: 'string' },
+            example: ['68e4fddf48b66e92d9ef1f88', '68e4fddf48b66e92d9ef1f89'],
+            description: 'Array of organization IDs participating in conversation',
           },
           participants: {
             type: 'array',
@@ -263,9 +277,19 @@ const swaggerDefinition = {
                   type: 'object',
                   properties: {
                     _id: { type: 'string' },
-                    firstName: { type: 'string' },
-                    lastName: { type: 'string' },
+                    userId: { type: 'string', example: 'SME000001' },
+                    firstName: { type: 'string', example: 'John' },
+                    lastName: { type: 'string', example: 'Doe' },
                     avatarUrl: { type: 'string', nullable: true },
+                  },
+                },
+                organization: {
+                  type: 'object',
+                  properties: {
+                    _id: { type: 'string' },
+                    orgId: { type: 'string', example: 'ORG000001' },
+                    name: { type: 'string', example: 'Electroland Ghana' },
+                    logoUrl: { type: 'string', nullable: true },
                   },
                 },
                 joinedAt: {
@@ -279,6 +303,7 @@ const swaggerDefinition = {
                 },
                 isActive: {
                   type: 'boolean',
+                  example: true,
                 },
               },
             },
@@ -287,10 +312,14 @@ const swaggerDefinition = {
             type: 'object',
             nullable: true,
             properties: {
-              content: { type: 'string' },
-              sender: { type: 'string' },
+              content: { type: 'string', example: 'Looking forward to collaborating' },
+              sender: { type: 'string', example: '68e51c2a9561b12c3ecdbba0' },
               timestamp: { type: 'string', format: 'date-time' },
             },
+          },
+          isActive: {
+            type: 'boolean',
+            example: true,
           },
           createdAt: {
             type: 'string',
@@ -307,23 +336,31 @@ const swaggerDefinition = {
         properties: {
           _id: {
             type: 'string',
+            example: '68e51c2a9561b12c3ecdbba0',
+          },
+          messageId: {
+            type: 'string',
+            example: 'MSG000001',
+            description: 'Unique message identifier',
           },
           conversation: {
             type: 'string',
-            description: 'Conversation ID',
+            example: '68e51c2a9561b12c3ecdbba0',
+            description: 'Conversation MongoDB ObjectId',
           },
           sender: {
             type: 'object',
             properties: {
               _id: { type: 'string' },
-              firstName: { type: 'string' },
-              lastName: { type: 'string' },
+              userId: { type: 'string', example: 'SME000001' },
+              firstName: { type: 'string', example: 'John' },
+              lastName: { type: 'string', example: 'Doe' },
               avatarUrl: { type: 'string', nullable: true },
             },
           },
           content: {
             type: 'string',
-            example: 'Hello, how can we collaborate on carbon reduction?',
+            example: 'Hello! Let\'s discuss our carbon reduction strategies.',
           },
           messageType: {
             type: 'string',
@@ -333,14 +370,25 @@ const swaggerDefinition = {
           fileUrl: {
             type: 'string',
             nullable: true,
+            example: 'https://res.cloudinary.com/demo/document.pdf',
           },
           fileName: {
             type: 'string',
             nullable: true,
+            example: 'carbon-report-2025.pdf',
+          },
+          isEdited: {
+            type: 'boolean',
+            default: false,
           },
           isDeleted: {
             type: 'boolean',
             default: false,
+          },
+          readBy: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Array of user IDs who have read this message',
           },
           createdAt: {
             type: 'string',

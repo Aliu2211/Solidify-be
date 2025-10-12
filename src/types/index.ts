@@ -45,6 +45,7 @@ export interface IOrganization extends Document {
 
 export interface IConversationParticipant {
   user: Types.ObjectId;
+  organization: Types.ObjectId;
   joinedAt: Date;
   lastReadAt?: Date;
   isActive: boolean;
@@ -58,17 +59,21 @@ export interface ILastMessage {
 
 export interface IConversation extends Document {
   _id: Types.ObjectId;
+  conversationId: string;
   type: 'direct' | 'group';
   name?: string;
+  organizations: Types.ObjectId[];
   participants: IConversationParticipant[];
   createdBy: Types.ObjectId;
   lastMessage?: ILastMessage;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface IMessage extends Document {
   _id: Types.ObjectId;
+  messageId: string;
   conversation: Types.ObjectId;
   sender: Types.ObjectId;
   messageType: 'text' | 'file' | 'image';

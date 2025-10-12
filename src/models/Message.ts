@@ -4,6 +4,10 @@ import { MESSAGE_TYPES } from '../utils/constants';
 
 const messageSchema = new Schema<IMessage>(
   {
+    messageId: {
+      type: String,
+      unique: true,
+    },
     conversation: {
       type: Schema.Types.ObjectId,
       ref: 'Conversation',
@@ -51,7 +55,17 @@ const messageSchema = new Schema<IMessage>(
   }
 );
 
+// Generate messageId before saving
+messageSchema.pre('save', async function (next) {
+  if (!this.messageId) {
+    const count = await mongoose.model('Message').countDocuments();
+    this.messageId = `MSG${String(count + 1).padStart(6, '0')}`;
+  }
+  next();
+});
+
 // Indexes
+messageSchema.index({ messageId: 1 });
 messageSchema.index({ conversation: 1, createdAt: -1 });
 messageSchema.index({ sender: 1 });
 
