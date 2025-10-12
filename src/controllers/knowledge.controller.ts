@@ -3,7 +3,7 @@ import { AuthRequest } from '../types';
 import { KnowledgeArticle } from '../models';
 import { ApiResponseUtil } from '../utils/response';
 import { Helpers } from '../utils/helpers';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/constants';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES, SUSTAINABILITY_LEVELS } from '../utils/constants';
 import { asyncHandler } from '../middleware/errorHandler';
 
 export class KnowledgeController {
@@ -63,16 +63,27 @@ export class KnowledgeController {
    * Create article (Admin/Manager only)
    */
   static createArticle = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { title, content, summary, sustainabilityLevel, category, tags, featured } = req.body;
+    const { title, content, summary, sustainabilityLevel, level, category, tags, featured } = req.body;
 
     const slug = Helpers.generateSlug(title);
+
+    // Convert level string to sustainabilityLevel number if provided
+    let finalSustainabilityLevel = sustainabilityLevel;
+    if (!finalSustainabilityLevel && level) {
+      const levelMap: { [key: string]: number } = {
+        foundation: SUSTAINABILITY_LEVELS.LEVEL_1,
+        efficiency: SUSTAINABILITY_LEVELS.LEVEL_2,
+        transformation: SUSTAINABILITY_LEVELS.LEVEL_3,
+      };
+      finalSustainabilityLevel = levelMap[level.toLowerCase()];
+    }
 
     const article = await KnowledgeArticle.create({
       title,
       slug,
       content,
       summary,
-      sustainabilityLevel,
+      sustainabilityLevel: finalSustainabilityLevel,
       category,
       tags,
       featured,

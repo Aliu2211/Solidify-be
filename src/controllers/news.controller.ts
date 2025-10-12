@@ -61,7 +61,11 @@ export class NewsController {
    * Create news article (Admin only)
    */
   static createNews = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { title, content, summary, imageUrl, category, tags, source, sourceUrl, featured } = req.body;
+    // Handle legacy field names for backward compatibility
+    const summary = req.body.summary || req.body.excerpt;
+    const imageUrl = req.body.imageUrl || req.body.coverImage;
+
+    const { title, content, category, tags, source, sourceUrl, featured } = req.body;
 
     const slug = Helpers.generateSlug(title);
 
