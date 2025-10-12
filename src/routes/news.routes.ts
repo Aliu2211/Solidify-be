@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { NewsController } from '../controllers/news.controller';
 import { authenticate, adminOnly } from '../middleware/auth.middleware';
+import { createNewsValidator } from '../validators/news.validator';
+import { validate } from '../middleware/validate.middleware';
 
 const router = Router();
 
@@ -90,6 +92,7 @@ router.get('/:slug', NewsController.getNewsArticle);
  *             required:
  *               - title
  *               - content
+ *               - summary
  *               - category
  *             properties:
  *               title:
@@ -98,10 +101,11 @@ router.get('/:slug', NewsController.getNewsArticle);
  *               content:
  *                 type: string
  *                 example: Full article content...
- *               excerpt:
+ *               summary:
  *                 type: string
+ *                 maxLength: 500
  *                 example: Ghana's government announces new carbon credit program
- *               coverImage:
+ *               imageUrl:
  *                 type: string
  *                 example: https://example.com/image.jpg
  *               category:
@@ -113,10 +117,15 @@ router.get('/:slug', NewsController.getNewsArticle);
  *                 items:
  *                   type: string
  *                 example: ["ghana", "carbon-credits", "policy"]
- *               publishedAt:
+ *               source:
  *                 type: string
- *                 format: date-time
- *                 example: 2025-10-07T12:00:00Z
+ *                 example: Ghana Ministry of Environment
+ *               sourceUrl:
+ *                 type: string
+ *                 example: https://example.com/source
+ *               featured:
+ *                 type: boolean
+ *                 default: false
  *     responses:
  *       201:
  *         description: News article created successfully
@@ -125,6 +134,6 @@ router.get('/:slug', NewsController.getNewsArticle);
  *             schema:
  *               $ref: '#/components/schemas/NewsArticle'
  */
-router.post('/', authenticate, adminOnly, NewsController.createNews);
+router.post('/', authenticate, adminOnly, createNewsValidator, validate, NewsController.createNews);
 
 export default router;
