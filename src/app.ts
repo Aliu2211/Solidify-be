@@ -42,9 +42,9 @@ const corsOptions = {
       }
     }
 
-    // In production, allow requests from the Render domain (for Swagger UI)
+    // In production, allow requests from the Render domains (for Swagger UI)
     if (config.NODE_ENV === 'production') {
-      if (origin.includes('solidify-api.onrender.com')) {
+      if (origin.includes('solidify-api.onrender.com') || origin.includes('solidify.onrender.com')) {
         return callback(null, true);
       }
     }

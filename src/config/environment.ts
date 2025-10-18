@@ -84,7 +84,8 @@ const config: Config = {
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS?.split(',').map(origin => origin.trim()) || [
     'http://localhost:3000',
     'http://localhost:5000',
-    'https://solidify-api.onrender.com'
+    'https://solidify-api.onrender.com',
+    'https://solidify.onrender.com'
   ],
 
   // Rate Limiting
