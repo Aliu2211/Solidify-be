@@ -35,18 +35,14 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    // In development mode, allow all localhost origins
-    if (config.NODE_ENV === 'development') {
-      if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-        return callback(null, true);
-      }
+    // Allow localhost origins (for development)
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
     }
 
-    // In production, allow requests from the Render domains (for Swagger UI)
-    if (config.NODE_ENV === 'production') {
-      if (origin.includes('solidify-api.onrender.com') || origin.includes('solidify.onrender.com')) {
-        return callback(null, true);
-      }
+    // Allow Render domains (for Swagger UI in production)
+    if (origin.includes('solidify-api.onrender.com') || origin.includes('solidify.onrender.com')) {
+      return callback(null, true);
     }
 
     // Reject all other origins
