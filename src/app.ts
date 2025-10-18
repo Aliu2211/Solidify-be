@@ -22,44 +22,47 @@ app.use(helmet({
 }));
 app.use(mongoSanitize());
 
-// CORS - More permissive configuration for Swagger UI and API access
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, Postman, curl, or same-origin)
-    if (!origin) return callback(null, true);
-
-    // Check if origin is in allowed list
-    if (config.ALLOWED_ORIGINS.includes(origin)) {
+// CORS - Permissive configuration for development and Swagger UI
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // Allow requests with no origin (mobile apps, Postman, same-origin, server-to-server)
+    if (!origin) {
       return callback(null, true);
     }
 
-    // Allow same-host requests (for Swagger UI)
-    try {
-      const requestUrl = new URL(origin);
-
-      // In development, allow all localhost requests
-      if (config.NODE_ENV === 'development' && (requestUrl.hostname === 'localhost' || requestUrl.hostname === '127.0.0.1')) {
-        return callback(null, true);
-      }
-
-      // In production, allow requests from the same domain (for Swagger UI)
-      if (config.NODE_ENV === 'production' && requestUrl.hostname === 'solidify-api.onrender.com') {
-        return callback(null, true);
-      }
-    } catch (error) {
-      // Invalid URL format, log and reject
-      logger.warn(`Invalid origin URL: ${origin}`);
+    // Allow if origin is in the allowed list
+    if (config.ALLOWED_ORIGINS.indexOf(origin) !== -1) {
+      return callback(null, true);
     }
 
-    // Log rejected CORS requests for debugging
-    logger.warn(`CORS blocked origin: ${origin}`);
-    callback(new Error('Not allowed by CORS'));
+    // In development mode, allow all localhost origins
+    if (config.NODE_ENV === 'development') {
+      if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        return callback(null, true);
+      }
+    }
+
+    // In production, allow requests from the Render domain (for Swagger UI)
+    if (config.NODE_ENV === 'production') {
+      if (origin.includes('solidify-api.onrender.com')) {
+        return callback(null, true);
+      }
+    }
+
+    // Reject all other origins
+    const msg = `Origin ${origin} not allowed by CORS`;
+    logger.warn(msg);
+    callback(new Error(msg));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
-}));
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
