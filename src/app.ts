@@ -24,8 +24,29 @@ app.use(mongoSanitize());
 
 // CORS
 app.use(cors({
-  origin: config.ALLOWED_ORIGINS,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, Postman, or same-origin)
+    if (!origin) return callback(null, true);
+
+    // Check if origin is in allowed list
+    if (config.ALLOWED_ORIGINS.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // In production, allow requests from the same domain (for Swagger UI)
+    if (config.NODE_ENV === 'production') {
+      const requestUrl = new URL(origin);
+      const allowedUrl = new URL('https://solidify-api.onrender.com');
+      if (requestUrl.host === allowedUrl.host) {
+        return callback(null, true);
+      }
+    }
+
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
 }));
 
 // Body parsing
