@@ -22,10 +22,10 @@ app.use(helmet({
 }));
 app.use(mongoSanitize());
 
-// CORS
+// CORS - More permissive configuration for Swagger UI and API access
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, Postman, or same-origin)
+    // Allow requests with no origin (like mobile apps, Postman, curl, or same-origin)
     if (!origin) return callback(null, true);
 
     // Check if origin is in allowed list
@@ -38,27 +38,27 @@ app.use(cors({
       const requestUrl = new URL(origin);
 
       // In development, allow all localhost requests
-      if (config.NODE_ENV === 'development' && requestUrl.hostname === 'localhost') {
+      if (config.NODE_ENV === 'development' && (requestUrl.hostname === 'localhost' || requestUrl.hostname === '127.0.0.1')) {
         return callback(null, true);
       }
 
-      // In production, allow requests from the same domain
-      if (config.NODE_ENV === 'production') {
-        const allowedUrl = new URL('https://solidify-api.onrender.com');
-        if (requestUrl.host === allowedUrl.host) {
-          return callback(null, true);
-        }
+      // In production, allow requests from the same domain (for Swagger UI)
+      if (config.NODE_ENV === 'production' && requestUrl.hostname === 'solidify-api.onrender.com') {
+        return callback(null, true);
       }
     } catch (error) {
-      // Invalid URL, reject
-      return callback(new Error('Not allowed by CORS'));
+      // Invalid URL format, log and reject
+      logger.warn(`Invalid origin URL: ${origin}`);
     }
 
+    // Log rejected CORS requests for debugging
+    logger.warn(`CORS blocked origin: ${origin}`);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
 }));
 
 // Body parsing
