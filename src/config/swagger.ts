@@ -11,6 +11,8 @@ const swaggerDefinition = {
       This API provides endpoints for carbon footprint tracking, inter-organizational chat,
       knowledge base management, and sustainability news.
 
+      **📥 Download OpenAPI Specification:** [/api-docs.json](/api-docs.json)
+
       **Features:**
       - 🔐 JWT Authentication with Access & Refresh Tokens
       - 💬 Real-time Chat with Socket.io
