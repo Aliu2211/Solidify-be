@@ -458,12 +458,14 @@ const swaggerDefinition = {
           content: {
             type: 'string',
           },
-          excerpt: {
+          summary: {
             type: 'string',
+            example: 'Ghana\'s government announces new carbon credit program',
           },
-          coverImage: {
+          imageUrl: {
             type: 'string',
             nullable: true,
+            example: 'https://example.com/image.jpg',
           },
           category: {
             type: 'string',
@@ -473,6 +475,18 @@ const swaggerDefinition = {
           tags: {
             type: 'array',
             items: { type: 'string' },
+          },
+          source: {
+            type: 'string',
+            nullable: true,
+          },
+          sourceUrl: {
+            type: 'string',
+            nullable: true,
+          },
+          featured: {
+            type: 'boolean',
+            example: false,
           },
           publishedAt: {
             type: 'string',

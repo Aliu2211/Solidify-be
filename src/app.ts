@@ -33,13 +33,25 @@ app.use(cors({
       return callback(null, true);
     }
 
-    // In production, allow requests from the same domain (for Swagger UI)
-    if (config.NODE_ENV === 'production') {
+    // Allow same-host requests (for Swagger UI)
+    try {
       const requestUrl = new URL(origin);
-      const allowedUrl = new URL('https://solidify-api.onrender.com');
-      if (requestUrl.host === allowedUrl.host) {
+
+      // In development, allow all localhost requests
+      if (config.NODE_ENV === 'development' && requestUrl.hostname === 'localhost') {
         return callback(null, true);
       }
+
+      // In production, allow requests from the same domain
+      if (config.NODE_ENV === 'production') {
+        const allowedUrl = new URL('https://solidify-api.onrender.com');
+        if (requestUrl.host === allowedUrl.host) {
+          return callback(null, true);
+        }
+      }
+    } catch (error) {
+      // Invalid URL, reject
+      return callback(new Error('Not allowed by CORS'));
     }
 
     callback(new Error('Not allowed by CORS'));
