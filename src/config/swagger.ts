@@ -50,7 +50,7 @@ const swaggerDefinition = {
       description: 'Development server',
     },
     {
-      url: `https://solidify-api.onrender.com/api/${config.API_VERSION}`,
+      url: `https://solidify.onrender.com/api/${config.API_VERSION}`,
       description: 'Production server',
     },
   ],

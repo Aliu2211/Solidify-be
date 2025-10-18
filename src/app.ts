@@ -40,8 +40,8 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    // Allow Render domains (for Swagger UI in production)
-    if (origin.includes('solidify-api.onrender.com') || origin.includes('solidify.onrender.com')) {
+    // Allow Render domain (for Swagger UI in production)
+    if (origin.includes('solidify.onrender.com')) {
       return callback(null, true);
     }
 
