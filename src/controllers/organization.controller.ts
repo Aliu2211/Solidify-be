@@ -186,7 +186,8 @@ export class OrganizationController {
             joinedAt: new Date(),
             isActive: true
           }
-        ]
+        ],
+        createdBy: currentUser.id
       });
 
       await conversation.populate('participants.user participants.organization');

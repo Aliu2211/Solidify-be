@@ -29,9 +29,15 @@ const swaggerDefinition = {
       4. **Get Organizations:** Use \`GET /organizations\` or \`GET /auth/organizations\` to see available orgs
       5. **Create/Register:** Now you can create new organizations or register new users
 
+      **🆕 New Find SME & Chat Features:**
+      - 👥 **List Organization Users:** \`GET /organizations/{id}/users\` - See all users from an organization
+      - 💬 **Connect with Organization:** \`POST /organizations/{id}/connect\` - Create group or direct chat
+        - Group Chat: Set \`connectType: "organization"\` to chat with entire organization
+        - Direct Chat: Set \`connectType: "user"\` with \`userId\` to chat with specific person
+
       **Available Organizations (from seed data):**
-      - Electroland Ghana Ltd: \`68e4fddf48b66e92d9ef1f88\`
-      - Hisense Ghana: \`68e4fddf48b66e92d9ef1f89\`
+      - Use \`GET /organizations\` to get actual organization IDs
+      - Seeded organizations: Electroland Ghana Ltd, Hisense Ghana
 
       **Author:** Jehiel Britstot Houmanou (BSc Capstone Project - June 2025)
     `,
