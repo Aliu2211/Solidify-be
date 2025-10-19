@@ -158,7 +158,7 @@ export class OrganizationController {
       // Check if direct conversation already exists between these two users
       const existingConversation = await Conversation.findOne({
         type: 'direct',
-        'participants.user': { $all: [currentUser._id, targetUser._id] }
+        'participants.user': { $all: [currentUser.id, targetUser._id] }
       }).populate('participants.user participants.organization');
 
       if (existingConversation) {
@@ -175,7 +175,7 @@ export class OrganizationController {
         organizations: [currentUser.organization, targetOrgId],
         participants: [
           {
-            user: currentUser._id,
+            user: currentUser.id,
             organization: currentUser.organization,
             joinedAt: new Date(),
             isActive: true
@@ -232,13 +232,13 @@ export class OrganizationController {
       ]);
 
       // Make sure current user is included
-      const allParticipants = new Set([currentUser._id.toString()]);
+      const allParticipants = new Set([currentUser.id]);
       currentOrgUsers.forEach(user => allParticipants.add(user._id.toString()));
       targetOrgUsers.forEach(user => allParticipants.add(user._id.toString()));
 
       // Create participants array
       const participants = Array.from(allParticipants).map(userId => {
-        const user = [...currentOrgUsers, ...targetOrgUsers, currentUser].find(
+        const user = [...currentOrgUsers, ...targetOrgUsers].find(
           u => u._id.toString() === userId
         );
         return {
