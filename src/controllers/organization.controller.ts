@@ -3,6 +3,9 @@ import { AuthRequest } from '../types';
 import { asyncHandler } from '../middleware/errorHandler';
 import { ApiResponseUtil } from '../utils/response';
 import Organization from '../models/Organization';
+import User from '../models/User';
+import Conversation from '../models/Conversation';
+import { ERROR_MESSAGES } from '../utils/constants';
 
 export class OrganizationController {
   /**
@@ -87,5 +90,180 @@ export class OrganizationController {
     }
 
     return ApiResponseUtil.success(res, 'Organization deleted successfully');
+  });
+
+  /**
+   * Get users from a specific organization
+   */
+  static getOrganizationUsers = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+
+    // Verify organization exists
+    const organization = await Organization.findById(id);
+    if (!organization) {
+      return ApiResponseUtil.notFound(res, ERROR_MESSAGES.ORGANIZATION_NOT_FOUND);
+    }
+
+    // Find all active users belonging to this organization
+    const users = await User.find({
+      organization: id,
+      isActive: true
+    })
+    .select('_id userId firstName lastName email role avatarUrl')
+    .sort({ role: 1, firstName: 1 }); // Admins first, then alphabetically
+
+    return ApiResponseUtil.success(
+      res,
+      'Organization users retrieved successfully',
+      users
+    );
+  });
+
+  /**
+   * Connect with an organization (create conversation)
+   */
+  static connectWithOrganization = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { id: targetOrgId } = req.params;
+    const { connectType = 'organization', userId } = req.body;
+    const currentUser = req.user!;
+
+    // Validate: Can't connect to own organization
+    if (targetOrgId === currentUser.organization.toString()) {
+      return ApiResponseUtil.badRequest(res, 'Cannot connect to your own organization');
+    }
+
+    // Verify target organization exists
+    const targetOrg = await Organization.findById(targetOrgId);
+    if (!targetOrg) {
+      return ApiResponseUtil.notFound(res, ERROR_MESSAGES.ORGANIZATION_NOT_FOUND);
+    }
+
+    if (connectType === 'user') {
+      // User-to-User Chat
+      if (!userId) {
+        return ApiResponseUtil.badRequest(res, 'User ID is required for user-to-user chat');
+      }
+
+      // Verify target user exists and belongs to target organization
+      const targetUser = await User.findOne({
+        _id: userId,
+        organization: targetOrgId,
+        isActive: true
+      });
+
+      if (!targetUser) {
+        return ApiResponseUtil.notFound(res, 'User not found in target organization');
+      }
+
+      // Check if direct conversation already exists between these two users
+      const existingConversation = await Conversation.findOne({
+        type: 'direct',
+        'participants.user': { $all: [currentUser._id, targetUser._id] }
+      }).populate('participants.user participants.organization');
+
+      if (existingConversation) {
+        return ApiResponseUtil.success(
+          res,
+          'Conversation already exists',
+          existingConversation
+        );
+      }
+
+      // Create new direct conversation
+      const conversation = await Conversation.create({
+        type: 'direct',
+        organizations: [currentUser.organization, targetOrgId],
+        participants: [
+          {
+            user: currentUser._id,
+            organization: currentUser.organization,
+            joinedAt: new Date(),
+            isActive: true
+          },
+          {
+            user: targetUser._id,
+            organization: targetOrgId,
+            joinedAt: new Date(),
+            isActive: true
+          }
+        ]
+      });
+
+      await conversation.populate('participants.user participants.organization');
+
+      return ApiResponseUtil.created(
+        res,
+        'Direct conversation created successfully',
+        conversation
+      );
+
+    } else {
+      // Organization-to-Organization Chat (Group)
+
+      // Check if group conversation already exists between these organizations
+      const existingConversation = await Conversation.findOne({
+        type: 'group',
+        organizations: { $all: [currentUser.organization, targetOrgId], $size: 2 }
+      }).populate('participants.user participants.organization');
+
+      if (existingConversation) {
+        return ApiResponseUtil.success(
+          res,
+          'Conversation already exists',
+          existingConversation
+        );
+      }
+
+      // Get current organization details
+      const currentOrg = await Organization.findById(currentUser.organization);
+
+      // Find admins/managers from both organizations
+      const [currentOrgUsers, targetOrgUsers] = await Promise.all([
+        User.find({
+          organization: currentUser.organization,
+          role: { $in: ['admin', 'manager'] },
+          isActive: true
+        }).limit(3),
+        User.find({
+          organization: targetOrgId,
+          role: { $in: ['admin', 'manager'] },
+          isActive: true
+        }).limit(3)
+      ]);
+
+      // Make sure current user is included
+      const allParticipants = new Set([currentUser._id.toString()]);
+      currentOrgUsers.forEach(user => allParticipants.add(user._id.toString()));
+      targetOrgUsers.forEach(user => allParticipants.add(user._id.toString()));
+
+      // Create participants array
+      const participants = Array.from(allParticipants).map(userId => {
+        const user = [...currentOrgUsers, ...targetOrgUsers, currentUser].find(
+          u => u._id.toString() === userId
+        );
+        return {
+          user: userId,
+          organization: user?.organization || currentUser.organization,
+          joinedAt: new Date(),
+          isActive: true
+        };
+      });
+
+      // Create new group conversation
+      const conversation = await Conversation.create({
+        type: 'group',
+        name: `${currentOrg?.name} & ${targetOrg.name}`,
+        organizations: [currentUser.organization, targetOrgId],
+        participants
+      });
+
+      await conversation.populate('participants.user participants.organization');
+
+      return ApiResponseUtil.created(
+        res,
+        'Group conversation created successfully',
+        conversation
+      );
+    }
   });
 }
