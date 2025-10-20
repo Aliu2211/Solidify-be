@@ -255,7 +255,8 @@ export class OrganizationController {
         type: 'group',
         name: `${currentOrg?.name} & ${targetOrg.name}`,
         organizations: [currentUser.organization, targetOrgId],
-        participants
+        participants,
+        createdBy: currentUser.id
       });
 
       await conversation.populate('participants.user participants.organization');
