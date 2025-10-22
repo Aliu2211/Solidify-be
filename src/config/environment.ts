@@ -80,11 +80,12 @@ const config: Config = {
   EMAIL_FROM: process.env.EMAIL_FROM || 'Solidify <noreply@solidify.com>',
 
   // Frontend
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000' || 'https://solidify-fe.onrender.com',
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS?.split(',').map(origin => origin.trim()) || [
     'http://localhost:3000',
     'http://localhost:5000',
-    'https://solidify.onrender.com'
+    'https://solidify.onrender.com',
+    'https://solidify-fe.onrender.com'
   ],
 
   // Rate Limiting
@@ -104,7 +105,7 @@ const config: Config = {
   BCRYPT_SALT_ROUNDS: parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10),
 
   // Socket.io
-  SOCKET_CORS_ORIGIN: process.env.SOCKET_CORS_ORIGIN || 'http://localhost:3000'
+  SOCKET_CORS_ORIGIN: process.env.SOCKET_CORS_ORIGIN || 'http://localhost:3000,https://solidify-fe.onrender.com'
 };
 
 export default config;
