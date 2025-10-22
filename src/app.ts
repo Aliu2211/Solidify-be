@@ -79,15 +79,37 @@ if (config.NODE_ENV === 'development') {
   }));
 }
 
-// Rate limiting
+// Rate limiting - More flexible configuration
 const limiter = rateLimit({
   windowMs: config.RATE_LIMIT_WINDOW_MS,
   max: config.RATE_LIMIT_MAX_REQUESTS,
-  message: 'Too many requests from this IP, please try again later.',
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+    retryAfter: 'Please wait before making another request.'
+  },
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip rate limiting for certain conditions
+  skip: (req) => {
+    // Skip rate limiting in development
+    if (config.NODE_ENV === 'development') {
+      return true;
+    }
+    
+    // Skip for health checks and swagger docs
+    if (req.path === '/health' || req.path.startsWith('/api-docs')) {
+      return true;
+    }
+    
+    return false;
+  },
+  // Custom key generator to be more lenient with different IPs
+  keyGenerator: (req) => {
+    return req.ip || req.connection.remoteAddress || 'unknown';
+  }
 });
 
+// Apply rate limiting only to API routes, not all routes
 app.use('/api/', limiter);
 
 // Health check
