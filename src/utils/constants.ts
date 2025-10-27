@@ -61,6 +61,24 @@ export const GOAL_STATUS = {
   FAILED: 'failed',
 } as const;
 
+export const COURSE_STATUS = {
+  NOT_STARTED: 'not_started',
+  IN_PROGRESS: 'in_progress',
+  COMPLETED: 'completed',
+} as const;
+
+export const COMPLETION_CRITERIA_TYPES = {
+  READ: 'read',
+  QUIZ: 'quiz',
+  ASSESSMENT: 'assessment',
+} as const;
+
+export const RESOURCE_TYPES = {
+  PDF: 'pdf',
+  VIDEO: 'video',
+  LINK: 'link',
+} as const;
+
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -100,6 +118,12 @@ export const ERROR_MESSAGES = {
   // Content
   ARTICLE_NOT_FOUND: 'Article not found',
   NEWS_NOT_FOUND: 'News article not found',
+
+  // Learning
+  COURSE_NOT_FOUND: 'Course not found',
+  COURSE_ALREADY_COMPLETED: 'Course already completed',
+  COURSE_NOT_AVAILABLE: 'Course not available for your current level',
+  LEVEL_NOT_COMPLETED: 'Previous level must be completed first',
 
   // Carbon
   CARBON_ENTRY_NOT_FOUND: 'Carbon entry not found',
@@ -151,6 +175,15 @@ export const SUCCESS_MESSAGES = {
   ENTRY_DELETED: 'Carbon entry deleted successfully',
   GOAL_CREATED: 'Sustainability goal created successfully',
   ROADMAP_UPDATED: 'Roadmap updated successfully',
+
+  // Learning
+  COURSE_CREATED: 'Course created successfully',
+  COURSE_UPDATED: 'Course updated successfully',
+  COURSE_DELETED: 'Course deleted successfully',
+  COURSE_STARTED: 'Course started successfully',
+  COURSE_COMPLETED: 'Course completed successfully',
+  LEVEL_COMPLETED: 'Congratulations! Level completed',
+  LEVEL_ADVANCED: 'Your organization has advanced to the next level',
 } as const;
 
 export const PAGINATION_DEFAULTS = {
