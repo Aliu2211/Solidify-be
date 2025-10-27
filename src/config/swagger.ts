@@ -20,6 +20,7 @@ const swaggerDefinition = {
       - 📚 Knowledge Base & Resources
       - 📰 Sustainability News Feed
       - 🎯 3-Level Sustainability System (Foundation, Efficiency, Transformation)
+      - 📖 Learning Management System with Course Progression
       - 🏢 Multi-organization Support
 
       **Getting Started:**
@@ -34,6 +35,13 @@ const swaggerDefinition = {
       - 💬 **Connect with Organization:** \`POST /organizations/{id}/connect\` - Create group or direct chat
         - Group Chat: Set \`connectType: "organization"\` to chat with entire organization
         - Direct Chat: Set \`connectType: "user"\` with \`userId\` to chat with specific person
+
+      **📖 Learning Management System:**
+      - 📚 **Course Management (Admin):** Create and manage courses for each sustainability level
+      - 🎓 **User Learning:** Start courses, complete them with quizzes/assessments
+      - 📊 **Progress Tracking:** Monitor individual and organization-wide learning progress
+      - 🏆 **Leaderboard:** See top learners in your organization
+      - ⬆️ **Level Advancement:** Organizations auto-advance when all users complete level courses
 
       **Available Organizations (from seed data):**
       - Use \`GET /organizations\` to get actual organization IDs
