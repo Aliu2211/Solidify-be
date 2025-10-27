@@ -18,6 +18,8 @@ export interface IUser extends Document {
   isActive: boolean;
   emailVerified: boolean;
   lastLogin?: Date;
+  learningLevel: number;
+  coursesCompleted: number;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -190,6 +192,11 @@ export interface ISustainabilityRoadmap extends Document {
   currentLevel: 1 | 2 | 3;
   milestones: IMilestone[];
   progressPercentage: number;
+  levelUnlockedAt: {
+    level1: Date;
+    level2?: Date;
+    level3?: Date;
+  };
   updatedAt: Date;
   createdAt: Date;
 }
@@ -204,6 +211,76 @@ export interface ISustainabilityGoal extends Document {
   currentEmissions?: number;
   status: 'in_progress' | 'achieved' | 'failed';
   description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ========================================
+// LEARNING SYSTEM TYPES
+// ========================================
+
+export interface ICourseResource {
+  title: string;
+  url: string;
+  type: 'pdf' | 'video' | 'link';
+}
+
+export interface ICompletionCriteria {
+  type: 'read' | 'quiz' | 'assessment';
+  passingScore?: number;
+  requiredTime?: number;
+}
+
+export interface ICourse extends Document {
+  _id: Types.ObjectId;
+  courseId: string;
+  title: string;
+  slug: string;
+  description: string;
+  content: string;
+  level: 1 | 2 | 3;
+  orderInLevel: number;
+  duration: number;
+  thumbnail?: string;
+  completionCriteria: ICompletionCriteria;
+  resources: ICourseResource[];
+  isActive: boolean;
+  createdBy: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IUserCourseProgress extends Document {
+  _id: Types.ObjectId;
+  user: Types.ObjectId;
+  course: Types.ObjectId;
+  organization: Types.ObjectId;
+  status: 'not_started' | 'in_progress' | 'completed';
+  startedAt?: Date;
+  completedAt?: Date;
+  timeSpent: number;
+  quizScore?: number;
+  attempts: number;
+  lastAccessedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ILevelProgress {
+  level: number;
+  totalCourses: number;
+  completedByAllUsers: number;
+  progressPercentage: number;
+  unlockedAt: Date;
+  completedAt?: Date;
+}
+
+export interface IOrganizationLearningProgress extends Document {
+  _id: Types.ObjectId;
+  organization: Types.ObjectId;
+  currentLevel: 1 | 2 | 3;
+  levelProgress: ILevelProgress[];
+  activeUsers: number;
   createdAt: Date;
   updatedAt: Date;
 }
