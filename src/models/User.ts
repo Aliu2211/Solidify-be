@@ -63,6 +63,17 @@ const userSchema = new Schema<IUser>(
       type: Date,
       default: null,
     },
+    learningLevel: {
+      type: Number,
+      default: 1,
+      min: 1,
+      max: 3,
+    },
+    coursesCompleted: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,
