@@ -5,6 +5,9 @@ import chatRoutes from './chat.routes';
 import knowledgeRoutes from './knowledge.routes';
 import newsRoutes from './news.routes';
 import organizationRoutes from './organization.routes';
+import courseRoutes from './course.routes';
+import learningRoutes from './learning.routes';
+import libraryRoutes from './library.routes';
 
 const router = Router();
 
@@ -14,5 +17,8 @@ router.use('/chat', chatRoutes);
 router.use('/knowledge', knowledgeRoutes);
 router.use('/news', newsRoutes);
 router.use('/organizations', organizationRoutes);
+router.use('/courses', courseRoutes);
+router.use('/learning', learningRoutes);
+router.use('/library', libraryRoutes);
 
 export default router;
