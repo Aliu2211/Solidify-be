@@ -13,7 +13,8 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "seed": "ts-node src/utils/seed.ts",
-    "seed:courses": "ts-node src/utils/seedCourses.ts"
+    "seed:courses": "ts-node src/utils/seedCourses.ts",
+    "seed:library": "ts-node src/utils/seedLibrary.ts"
   },
   "keywords": [
     "carbon-footprint",
