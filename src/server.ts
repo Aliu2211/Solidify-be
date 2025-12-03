@@ -17,6 +17,9 @@ const io = new SocketServer(server, {
   },
 });
 
+// Store io instance in app for access in controllers
+app.set('io', io);
+
 // Setup chat socket handlers
 setupChatSocket(io);
 

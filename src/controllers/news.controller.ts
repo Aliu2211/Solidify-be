@@ -87,4 +87,54 @@ export class NewsController {
 
     return ApiResponseUtil.created(res, SUCCESS_MESSAGES.NEWS_CREATED, article);
   });
+
+  /**
+   * Update news article (Admin only)
+   */
+  static updateNews = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { title, content, summary, imageUrl, category, tags, source, sourceUrl, featured, status } = req.body;
+
+    const article = await NewsArticle.findById(id);
+    if (!article) {
+      return ApiResponseUtil.notFound(res, ERROR_MESSAGES.NEWS_NOT_FOUND);
+    }
+
+    // Update fields if provided
+    if (title !== undefined) {
+      article.title = title;
+      article.slug = Helpers.generateSlug(title);
+    }
+    if (content !== undefined) article.content = content;
+    if (summary !== undefined) article.summary = summary;
+    if (imageUrl !== undefined) article.imageUrl = imageUrl;
+    if (category !== undefined) article.category = category;
+    if (tags !== undefined) article.tags = tags;
+    if (source !== undefined) article.source = source;
+    if (sourceUrl !== undefined) article.sourceUrl = sourceUrl;
+    if (featured !== undefined) article.featured = featured;
+    if (status !== undefined) article.status = status;
+
+    await article.save();
+
+    const updatedArticle = await NewsArticle.findById(id).populate('author', 'firstName lastName');
+
+    return ApiResponseUtil.success(res, 'News article updated successfully', updatedArticle);
+  });
+
+  /**
+   * Delete news article (Admin only)
+   */
+  static deleteNews = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+
+    const article = await NewsArticle.findById(id);
+    if (!article) {
+      return ApiResponseUtil.notFound(res, ERROR_MESSAGES.NEWS_NOT_FOUND);
+    }
+
+    await NewsArticle.findByIdAndDelete(id);
+
+    return ApiResponseUtil.success(res, 'News article deleted successfully');
+  });
 }

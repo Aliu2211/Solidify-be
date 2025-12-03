@@ -123,12 +123,17 @@ export class OrganizationController {
    * Connect with an organization (create conversation)
    */
   static connectWithOrganization = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const mongoose = require('mongoose');
     const { id: targetOrgId } = req.params;
     const { connectType = 'organization', userId } = req.body;
     const currentUser = req.user!;
 
+    // Convert both IDs to strings for proper comparison
+    const targetOrgIdStr = new mongoose.Types.ObjectId(targetOrgId).toString();
+    const currentUserOrgStr = new mongoose.Types.ObjectId(currentUser.organization).toString();
+
     // Validate: Can't connect to own organization
-    if (targetOrgId === currentUser.organization.toString()) {
+    if (targetOrgIdStr === currentUserOrgStr) {
       return ApiResponseUtil.badRequest(res, 'Cannot connect to your own organization');
     }
 

@@ -91,7 +91,11 @@ export class CarbonController {
    * Get dashboard analytics
    */
   static getDashboard = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const organizationId = req.user!.organization;
+    const mongoose = require('mongoose');
+    const organizationId = new mongoose.Types.ObjectId(req.user!.organization);
+
+    // Count total entries first to help with debugging
+    const entryCount = await CarbonEntry.countDocuments({ organization: organizationId });
 
     // Get total emissions
     const totalEmissions = await CarbonEntry.aggregate([
@@ -130,6 +134,7 @@ export class CarbonController {
     });
 
     return ApiResponseUtil.success(res, 'Dashboard data retrieved successfully', {
+      totalEntries: entryCount,
       totalEmissions: totalEmissions[0]?.total || 0,
       emissionsByType: byType,
       monthlyTrend,

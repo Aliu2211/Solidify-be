@@ -8,6 +8,7 @@ import organizationRoutes from './organization.routes';
 import courseRoutes from './course.routes';
 import learningRoutes from './learning.routes';
 import libraryRoutes from './library.routes';
+import userRoutes from './user.routes';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/organizations', organizationRoutes);
 router.use('/courses', courseRoutes);
 router.use('/learning', learningRoutes);
 router.use('/library', libraryRoutes);
+router.use('/users', userRoutes);
 
 export default router;

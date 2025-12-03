@@ -125,14 +125,15 @@ export class LibraryController {
     try {
       const { id } = req.params;
 
-      const resource = await LibraryResource.findById(id)
+      // Find resource with isActive filter to match list endpoint behavior
+      const resource = await LibraryResource.findOne({ _id: id, isActive: true })
         .populate('uploadedBy', 'firstName lastName email')
         .lean();
 
       if (!resource) {
         res.status(404).json({
           success: false,
-          message: 'Library resource not found',
+          message: 'Library resource not found or inactive',
         });
         return;
       }
@@ -146,6 +147,7 @@ export class LibraryController {
         data: resource,
       });
     } catch (error: any) {
+      console.error('Error fetching library resource:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve library resource',

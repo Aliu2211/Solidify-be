@@ -199,6 +199,20 @@ export class ChatController {
 
     await message.populate('sender', 'userId firstName lastName avatarUrl');
 
+    // Emit socket event to notify other participants
+    const io = (req as any).app.get('io');
+    if (io) {
+      // Emit to conversation room
+      io.to(`conversation:${conversationId}`).emit('new_message', message);
+
+      // Also emit to individual participants as fallback
+      conversation.participants.forEach(participant => {
+        if (participant.user.toString() !== userId && participant.isActive) {
+          io.to(`user:${participant.user}`).emit('new_message', message);
+        }
+      });
+    }
+
     return ApiResponseUtil.created(res, SUCCESS_MESSAGES.MESSAGE_SENT, message);
   });
 

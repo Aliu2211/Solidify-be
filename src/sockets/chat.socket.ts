@@ -29,7 +29,7 @@ export const setupChatSocket = (io: Server) => {
     }
   });
 
-  io.on('connection', (socket: Socket) => {
+  io.on('connection', async (socket: Socket) => {
     const userId = socket.data.user.id;
     logger.info(`User connected: ${userId}`);
 
@@ -41,6 +41,22 @@ export const setupChatSocket = (io: Server) => {
 
     // Join user's personal room
     socket.join(`user:${userId}`);
+
+    // Auto-join all active conversations
+    try {
+      const conversations = await Conversation.find({
+        'participants.user': userId,
+        'participants.isActive': true,
+        isActive: true,
+      }).select('_id');
+
+      conversations.forEach(conversation => {
+        socket.join(`conversation:${conversation._id}`);
+        logger.info(`User ${userId} auto-joined conversation ${conversation._id}`);
+      });
+    } catch (error) {
+      logger.error('Error auto-joining conversations:', error);
+    }
 
     // Join room
     socket.on(SOCKET_EVENTS.JOIN_ROOM, (data: { conversationId: string }) => {
@@ -82,6 +98,16 @@ export const setupChatSocket = (io: Server) => {
 
         // Emit to conversation room
         io.to(`conversation:${conversationId}`).emit(SOCKET_EVENTS.NEW_MESSAGE, message);
+
+        // Also emit to individual participants as fallback
+        const conversation = await Conversation.findById(conversationId);
+        if (conversation) {
+          conversation.participants.forEach(participant => {
+            if (participant.user.toString() !== userId && participant.isActive) {
+              io.to(`user:${participant.user}`).emit(SOCKET_EVENTS.NEW_MESSAGE, message);
+            }
+          });
+        }
 
         // Send delivery confirmation
         socket.emit(SOCKET_EVENTS.MESSAGE_DELIVERED, { messageId: message._id });
