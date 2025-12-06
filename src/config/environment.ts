@@ -86,7 +86,8 @@ const config: Config = {
     'http://localhost:5000',
     'https://solidify.onrender.com',
     'https://solidify-fe.onrender.com',
-    'https://solidify-fe-production.up.railway.app'
+    'https://solidify-fe-production.up.railway.app',
+    'https://solidify-fe.vercel.app'
   ],
 
   // Rate Limiting
@@ -106,7 +107,7 @@ const config: Config = {
   BCRYPT_SALT_ROUNDS: parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10),
 
   // Socket.io
-  SOCKET_CORS_ORIGIN: process.env.SOCKET_CORS_ORIGIN || 'http://localhost:3000,https://solidify-fe.onrender.com,https://solidify-fe-production.up.railway.app'
+  SOCKET_CORS_ORIGIN: process.env.SOCKET_CORS_ORIGIN || 'http://localhost:3000,https://solidify-fe.onrender.com,https://solidify-fe-production.up.railway.app,https://solidify-fe.vercel.app'
 };
 
 export default config;

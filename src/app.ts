@@ -41,7 +41,7 @@ const corsOptions = {
     }
 
     // Allow production domains (for Swagger UI and frontend in production)
-    if (origin.includes('solidify.onrender.com') || origin.includes('solidify-fe.onrender.com') || origin.includes('solidify-fe-production.up.railway.app')) {
+    if (origin.includes('solidify.onrender.com') || origin.includes('solidify-fe.onrender.com') || origin.includes('solidify-fe-production.up.railway.app') || origin.includes('solidify-fe.vercel.app')) {
       return callback(null, true);
     }
 
