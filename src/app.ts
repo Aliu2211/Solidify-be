@@ -13,8 +13,14 @@ import { customSwaggerCSS, customSwaggerHTML } from './config/swagger-theme';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import logger from './utils/logger';
+import dotenv from 'dotenv';
+import path from 'path';
 
+// Load environment variables
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 const app: Application = express();
+
+ ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS?.split(',').map(origin => origin.trim());
 
 // Security middleware
 app.use(helmet({
@@ -41,7 +47,13 @@ const corsOptions = {
     }
 
     // Allow production domains (for Swagger UI and frontend in production)
-    if (origin.includes('solidify.onrender.com') || origin.includes('solidify-fe.onrender.com') || origin.includes('solidify-fe-production.up.railway.app') || origin.includes('solidify-fe.vercel.app')) {
+    if (
+      origin.includes('solidify.onrender.com') ||
+      origin.includes('solidify-fe.onrender.com') ||
+      origin.includes('solidify-frontend-production.up.railway.app') ||
+      origin.includes('solidify-fe.vercel.app') ||
+      config.ALLOWED_ORIGINS.some((allowedOrigin: string) => origin.includes(allowedOrigin))
+    ) {
       return callback(null, true);
     }
 
