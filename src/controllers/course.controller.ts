@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../types';
 import { Course } from '../models';
 import { ApiResponseUtil } from '../utils/response';
+import { Helpers } from '../utils/helpers';
 import { asyncHandler } from '../middleware/errorHandler';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES, PAGINATION_DEFAULTS } from '../utils/constants';
 
@@ -40,9 +41,13 @@ export class CourseController {
     const courseCount = await Course.countDocuments();
     const courseId = `CRS${String(courseCount + 1).padStart(6, '0')}`;
 
+    // Generate slug from title (ensure it's present before Mongoose validation)
+    const slug = Helpers.generateSlug(title);
+
     const course = await Course.create({
       courseId,
       title,
+      slug,
       description,
       content,
       level,
