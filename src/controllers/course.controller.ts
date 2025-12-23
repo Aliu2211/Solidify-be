@@ -41,23 +41,42 @@ export class CourseController {
     const courseCount = await Course.countDocuments();
     const courseId = `CRS${String(courseCount + 1).padStart(6, '0')}`;
 
-    // Generate slug from title (ensure it's present before Mongoose validation)
-    const slug = Helpers.generateSlug(title);
+    // Try to generate a unique slug and create the course. Retry on slug duplicate key errors.
+    const MAX_SLUG_ATTEMPTS = 5;
+    let course = null as any;
 
-    const course = await Course.create({
-      courseId,
-      title,
-      slug,
-      description,
-      content,
-      level,
-      orderInLevel,
-      duration,
-      thumbnail,
-      completionCriteria,
-      resources: resources || [],
-      createdBy: currentUser.id,
-    });
+    for (let attempt = 1; attempt <= MAX_SLUG_ATTEMPTS; attempt++) {
+      const slug = Helpers.generateSlug(title);
+      try {
+        course = await Course.create({
+          courseId,
+          title,
+          slug,
+          description,
+          content,
+          level,
+          orderInLevel,
+          duration,
+          thumbnail,
+          completionCriteria,
+          resources: resources || [],
+          createdBy: currentUser.id,
+        });
+        break; // success
+      } catch (err: any) {
+        // Duplicate key error for slug
+        if (err && (err.code === 11000 || (err.name === 'MongoError' && err.code === 11000)) && err.message && err.message.includes('slug')) {
+          if (attempt === MAX_SLUG_ATTEMPTS) {
+            return ApiResponseUtil.error(res, 'Could not generate a unique slug. Please try again', 500);
+          }
+          // otherwise retry
+          continue;
+        }
+
+        // Re-throw other errors
+        throw err;
+      }
+    }
 
     return ApiResponseUtil.created(res, SUCCESS_MESSAGES.COURSE_CREATED, course);
   });
