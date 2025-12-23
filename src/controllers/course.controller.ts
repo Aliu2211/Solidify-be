@@ -3,6 +3,7 @@ import { AuthRequest } from '../types';
 import { Course } from '../models';
 import { ApiResponseUtil } from '../utils/response';
 import { Helpers } from '../utils/helpers';
+import slugify from 'slugify';
 import { asyncHandler } from '../middleware/errorHandler';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES, PAGINATION_DEFAULTS } from '../utils/constants';
 
@@ -44,9 +45,11 @@ export class CourseController {
     // Try to generate a unique slug and create the course. Retry on slug duplicate key errors.
     const MAX_SLUG_ATTEMPTS = 5;
     let course = null as any;
+    let lastSlugTried = '';
 
     for (let attempt = 1; attempt <= MAX_SLUG_ATTEMPTS; attempt++) {
       const slug = Helpers.generateSlug(title);
+      lastSlugTried = slug;
       try {
         course = await Course.create({
           courseId,
@@ -64,17 +67,65 @@ export class CourseController {
         });
         break; // success
       } catch (err: any) {
-        // Duplicate key error for slug
-        if (err && (err.code === 11000 || (err.name === 'MongoError' && err.code === 11000)) && err.message && err.message.includes('slug')) {
-          if (attempt === MAX_SLUG_ATTEMPTS) {
-            return ApiResponseUtil.error(res, 'Could not generate a unique slug. Please try again', 500);
-          }
-          // otherwise retry
-          continue;
+        // Duplicate key error on slug (robust detection)
+        const isDuplicateSlug =
+          err && (err.code === 11000 || (err.name === 'MongoError' && err.code === 11000)) &&
+          (err.keyValue?.slug || err.keyPattern?.slug || (err.message && err.message.includes('slug')));
+
+        if (isDuplicateSlug) {
+          // Last attempt will fall through to deterministic fallback below
+          if (attempt < MAX_SLUG_ATTEMPTS) continue;
+          else break;
         }
 
         // Re-throw other errors
         throw err;
+      }
+    }
+
+    // If we didn't get a course yet, attempt deterministic fallback using courseId to guarantee uniqueness
+    if (!course) {
+      // base slug (deterministic)
+      const baseSlug = slugify(title, { lower: true, strict: true, trim: true });
+      const deterministicSlug = `${baseSlug}-${courseId.toLowerCase()}`;
+
+      try {
+        course = await Course.create({
+          courseId,
+          title,
+          slug: deterministicSlug,
+          description,
+          content,
+          level,
+          orderInLevel,
+          duration,
+          thumbnail,
+          completionCriteria,
+          resources: resources || [],
+          createdBy: currentUser.id,
+        });
+      } catch (err: any) {
+        // If even deterministic slug fails (very unlikely), try one last time with timestamp suffix
+        const fallbackSlug = `${baseSlug}-${courseId.toLowerCase()}-${Date.now()}`;
+        try {
+          course = await Course.create({
+            courseId,
+            title,
+            slug: fallbackSlug,
+            description,
+            content,
+            level,
+            orderInLevel,
+            duration,
+            thumbnail,
+            completionCriteria,
+            resources: resources || [],
+            createdBy: currentUser.id,
+          });
+        } catch (finalErr) {
+          // give a helpful error back to client
+          return ApiResponseUtil.error(res, 'Could not generate a unique slug. Please try again', 500);
+        }
       }
     }
 
