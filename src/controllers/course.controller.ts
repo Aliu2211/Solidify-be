@@ -38,9 +38,8 @@ export class CourseController {
       );
     }
 
-    // Generate courseId
-    const courseCount = await Course.countDocuments();
-    const courseId = `CRS${String(courseCount + 1).padStart(6, '0')}`;
+    // Generate collision-resistant courseId (avoid countDocuments which is not atomic)
+    const courseId = Helpers.generateUserId('CRS');
 
     // Try to generate a unique slug and create the course. Retry on slug duplicate key errors.
     const MAX_SLUG_ATTEMPTS = 5;
