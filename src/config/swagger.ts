@@ -11,6 +11,8 @@ const swaggerDefinition = {
       This API provides endpoints for carbon footprint tracking, inter-organizational chat,
       knowledge base management, and sustainability news.
 
+      **📥 Download OpenAPI Specification:** [/api-docs.json](/api-docs.json)
+
       **Features:**
       - 🔐 JWT Authentication with Access & Refresh Tokens
       - 💬 Real-time Chat with Socket.io
@@ -18,6 +20,7 @@ const swaggerDefinition = {
       - 📚 Knowledge Base & Resources
       - 📰 Sustainability News Feed
       - 🎯 3-Level Sustainability System (Foundation, Efficiency, Transformation)
+      - 📖 Learning Management System with Course Progression
       - 🏢 Multi-organization Support
 
       **Getting Started:**
@@ -27,9 +30,22 @@ const swaggerDefinition = {
       4. **Get Organizations:** Use \`GET /organizations\` or \`GET /auth/organizations\` to see available orgs
       5. **Create/Register:** Now you can create new organizations or register new users
 
+      **🆕 New Find SME & Chat Features:**
+      - 👥 **List Organization Users:** \`GET /organizations/{id}/users\` - See all users from an organization
+      - 💬 **Connect with Organization:** \`POST /organizations/{id}/connect\` - Create group or direct chat
+        - Group Chat: Set \`connectType: "organization"\` to chat with entire organization
+        - Direct Chat: Set \`connectType: "user"\` with \`userId\` to chat with specific person
+
+      **📖 Learning Management System:**
+      - 📚 **Course Management (Admin):** Create and manage courses for each sustainability level
+      - 🎓 **User Learning:** Start courses, complete them with quizzes/assessments
+      - 📊 **Progress Tracking:** Monitor individual and organization-wide learning progress
+      - 🏆 **Leaderboard:** See top learners in your organization
+      - ⬆️ **Level Advancement:** Organizations auto-advance when all users complete level courses
+
       **Available Organizations (from seed data):**
-      - Electroland Ghana Ltd: \`68e4fddf48b66e92d9ef1f88\`
-      - Hisense Ghana: \`68e4fddf48b66e92d9ef1f89\`
+      - Use \`GET /organizations\` to get actual organization IDs
+      - Seeded organizations: Electroland Ghana Ltd, Hisense Ghana
 
       **Author:** Jehiel Britstot Houmanou (BSc Capstone Project - June 2025)
     `,
@@ -48,7 +64,7 @@ const swaggerDefinition = {
       description: 'Development server',
     },
     {
-      url: `https://solidify-api.onrender.com/api/${config.API_VERSION}`,
+      url: `https://solidify.onrender.com/api/${config.API_VERSION}`,
       description: 'Production server',
     },
   ],
@@ -458,12 +474,14 @@ const swaggerDefinition = {
           content: {
             type: 'string',
           },
-          excerpt: {
+          summary: {
             type: 'string',
+            example: 'Ghana\'s government announces new carbon credit program',
           },
-          coverImage: {
+          imageUrl: {
             type: 'string',
             nullable: true,
+            example: 'https://example.com/image.jpg',
           },
           category: {
             type: 'string',
@@ -473,6 +491,18 @@ const swaggerDefinition = {
           tags: {
             type: 'array',
             items: { type: 'string' },
+          },
+          source: {
+            type: 'string',
+            nullable: true,
+          },
+          sourceUrl: {
+            type: 'string',
+            nullable: true,
+          },
+          featured: {
+            type: 'boolean',
+            example: false,
           },
           publishedAt: {
             type: 'string',

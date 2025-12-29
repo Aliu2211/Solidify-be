@@ -185,4 +185,78 @@ router.get('/search', KnowledgeController.searchArticles);
  */
 router.post('/articles', authenticate, adminOrManager, createArticleValidator, validate, KnowledgeController.createArticle);
 
+/**
+ * @swagger
+ * /knowledge/articles/{id}:
+ *   put:
+ *     summary: Update knowledge article (Admin/Manager only)
+ *     tags: [Knowledge Base]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Article ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               summary:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *                 enum: [carbon-tracking, regulations, best-practices, case-studies, tools]
+ *               sustainabilityLevel:
+ *                 type: number
+ *                 enum: [1, 2, 3]
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               featured:
+ *                 type: boolean
+ *               status:
+ *                 type: string
+ *                 enum: [draft, published]
+ *     responses:
+ *       200:
+ *         description: Article updated successfully
+ *       404:
+ *         description: Article not found
+ */
+router.put('/articles/:id', authenticate, adminOrManager, KnowledgeController.updateArticle);
+
+/**
+ * @swagger
+ * /knowledge/articles/{id}:
+ *   delete:
+ *     summary: Delete knowledge article (Admin/Manager only)
+ *     tags: [Knowledge Base]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Article ID
+ *     responses:
+ *       200:
+ *         description: Article deleted successfully
+ *       404:
+ *         description: Article not found
+ */
+router.delete('/articles/:id', authenticate, adminOrManager, KnowledgeController.deleteArticle);
+
 export default router;

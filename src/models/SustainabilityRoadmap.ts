@@ -47,6 +47,20 @@ const sustainabilityRoadmapSchema = new Schema<ISustainabilityRoadmap>(
       min: 0,
       max: 100,
     },
+    levelUnlockedAt: {
+      level1: {
+        type: Date,
+        default: () => new Date(),
+      },
+      level2: {
+        type: Date,
+        default: null,
+      },
+      level3: {
+        type: Date,
+        default: null,
+      },
+    },
   },
   {
     timestamps: true,

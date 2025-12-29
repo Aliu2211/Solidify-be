@@ -13,8 +13,14 @@ import { customSwaggerCSS, customSwaggerHTML } from './config/swagger-theme';
 import routes from './routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import logger from './utils/logger';
+import dotenv from 'dotenv';
+import path from 'path';
 
+// Load environment variables
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 const app: Application = express();
+
+ ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS?.split(',').map(origin => origin.trim());
 
 // Security middleware
 app.use(helmet({
@@ -22,11 +28,49 @@ app.use(helmet({
 }));
 app.use(mongoSanitize());
 
-// CORS
-app.use(cors({
-  origin: config.ALLOWED_ORIGINS,
+// CORS - Permissive configuration for development and Swagger UI
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // Allow requests with no origin (mobile apps, Postman, same-origin, server-to-server)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Allow if origin is in the allowed list
+    if (config.ALLOWED_ORIGINS.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+
+    // Allow localhost origins (for development)
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+
+    // Allow production domains (for Swagger UI and frontend in production)
+    if (
+      origin.includes('solidify.onrender.com') ||
+      origin.includes('solidify-fe.onrender.com') ||
+      origin.includes('solidify-frontend-production.up.railway.app') ||
+      origin.includes('solidify-fe.vercel.app') ||
+      config.ALLOWED_ORIGINS.some((allowedOrigin: string) => origin.includes(allowedOrigin))
+    ) {
+      return callback(null, true);
+    }
+
+    // Reject all other origins
+    const msg = `Origin ${origin} not allowed by CORS`;
+    logger.warn(msg);
+    callback(new Error(msg));
+  },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -47,15 +91,37 @@ if (config.NODE_ENV === 'development') {
   }));
 }
 
-// Rate limiting
+// Rate limiting - More flexible configuration
 const limiter = rateLimit({
   windowMs: config.RATE_LIMIT_WINDOW_MS,
   max: config.RATE_LIMIT_MAX_REQUESTS,
-  message: 'Too many requests from this IP, please try again later.',
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+    retryAfter: 'Please wait before making another request.'
+  },
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip rate limiting for certain conditions
+  skip: (req) => {
+    // Skip rate limiting in development
+    if (config.NODE_ENV === 'development') {
+      return true;
+    }
+    
+    // Skip for health checks and swagger docs
+    if (req.path === '/health' || req.path.startsWith('/api-docs')) {
+      return true;
+    }
+    
+    return false;
+  },
+  // Custom key generator to be more lenient with different IPs
+  keyGenerator: (req) => {
+    return req.ip || req.connection.remoteAddress || 'unknown';
+  }
 });
 
+// Apply rate limiting only to API routes, not all routes
 app.use('/api/', limiter);
 
 // Health check

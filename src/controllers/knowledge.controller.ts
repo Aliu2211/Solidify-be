@@ -96,6 +96,54 @@ export class KnowledgeController {
   });
 
   /**
+   * Update article (Admin/Manager only)
+   */
+  static updateArticle = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { title, content, summary, sustainabilityLevel, category, tags, featured, status } = req.body;
+
+    const article = await KnowledgeArticle.findById(id);
+    if (!article) {
+      return ApiResponseUtil.notFound(res, ERROR_MESSAGES.ARTICLE_NOT_FOUND);
+    }
+
+    // Update fields if provided
+    if (title !== undefined) {
+      article.title = title;
+      article.slug = Helpers.generateSlug(title);
+    }
+    if (content !== undefined) article.content = content;
+    if (summary !== undefined) article.summary = summary;
+    if (sustainabilityLevel !== undefined) article.sustainabilityLevel = sustainabilityLevel;
+    if (category !== undefined) article.category = category;
+    if (tags !== undefined) article.tags = tags;
+    if (featured !== undefined) article.featured = featured;
+    if (status !== undefined) article.status = status;
+
+    await article.save();
+
+    const updatedArticle = await KnowledgeArticle.findById(id).populate('author', 'firstName lastName');
+
+    return ApiResponseUtil.success(res, 'Article updated successfully', updatedArticle);
+  });
+
+  /**
+   * Delete article (Admin/Manager only)
+   */
+  static deleteArticle = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+
+    const article = await KnowledgeArticle.findById(id);
+    if (!article) {
+      return ApiResponseUtil.notFound(res, ERROR_MESSAGES.ARTICLE_NOT_FOUND);
+    }
+
+    await KnowledgeArticle.findByIdAndDelete(id);
+
+    return ApiResponseUtil.success(res, 'Article deleted successfully');
+  });
+
+  /**
    * Search articles
    */
   static searchArticles = asyncHandler(async (req: AuthRequest, res: Response) => {

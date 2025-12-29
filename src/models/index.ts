@@ -8,3 +8,6 @@ export { default as CarbonEntry } from './CarbonEntry';
 export { default as EmissionFactor } from './EmissionFactor';
 export { default as SustainabilityRoadmap } from './SustainabilityRoadmap';
 export { default as SustainabilityGoal } from './SustainabilityGoal';
+export { default as Course } from './Course';
+export { default as UserCourseProgress } from './UserCourseProgress';
+export { default as OrganizationLearningProgress } from './OrganizationLearningProgress';

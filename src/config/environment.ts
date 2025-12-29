@@ -81,11 +81,18 @@ const config: Config = {
 
   // Frontend
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
-  ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+  ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS?.split(',').map(origin => origin.trim()) || [
+    'http://localhost:3000',
+    'http://localhost:5000',
+    'https://solidify.onrender.com',
+    'https://solidify-fe.onrender.com',
+    'https://solidify-frontend-production.up.railway.app',
+    'https://solidify-fe.vercel.app'
+  ],
 
   // Rate Limiting
-  RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10),
-  RATE_LIMIT_MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),
+  RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10), // 15 minutes
+  RATE_LIMIT_MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '10000', 10), // Increased to 10000 for better user experience
 
   // File Upload
   MAX_FILE_SIZE: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10), // 5MB
@@ -100,7 +107,7 @@ const config: Config = {
   BCRYPT_SALT_ROUNDS: parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10),
 
   // Socket.io
-  SOCKET_CORS_ORIGIN: process.env.SOCKET_CORS_ORIGIN || 'http://localhost:3000'
+  SOCKET_CORS_ORIGIN: process.env.SOCKET_CORS_ORIGIN || 'http://localhost:3000,https://solidify-fe.onrender.com,https://solidify-frontend-production.up.railway.app,https://solidify-fe.vercel.app'
 };
 
 export default config;

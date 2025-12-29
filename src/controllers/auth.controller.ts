@@ -165,6 +165,36 @@ export class AuthController {
   });
 
   /**
+   * Update user profile
+   */
+  static updateProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { firstName, lastName, email } = req.body;
+    const userId = req.user!.id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return ApiResponseUtil.notFound(res, ERROR_MESSAGES.USER_NOT_FOUND);
+    }
+
+    // Check if email is being changed and if it's already taken
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      if (existingUser) {
+        return ApiResponseUtil.conflict(res, ERROR_MESSAGES.EMAIL_ALREADY_EXISTS);
+      }
+      user.email = email.toLowerCase();
+    }
+
+    // Update fields if provided
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
+
+    await user.save();
+
+    return ApiResponseUtil.success(res, 'Profile updated successfully', Helpers.sanitizeUser(user));
+  });
+
+  /**
    * Get all organizations
    */
   static getOrganizations = asyncHandler(async (_req: AuthRequest, res: Response) => {

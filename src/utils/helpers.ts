@@ -4,14 +4,16 @@ import crypto from 'crypto';
 export class Helpers {
   /**
    * Generate a unique slug from a title
+   * @param title - The title to slugify
+   * @param suffixBytes - Number of random bytes to append (default 6 -> 12 hex chars)
    */
-  static generateSlug(title: string): string {
+  static generateSlug(title: string, suffixBytes: number = 6): string {
     const baseSlug = slugify(title, {
       lower: true,
       strict: true,
       trim: true,
     });
-    const randomString = crypto.randomBytes(4).toString('hex');
+    const randomString = crypto.randomBytes(suffixBytes).toString('hex');
     return `${baseSlug}-${randomString}`;
   }
 

@@ -136,4 +136,81 @@ router.get('/:slug', NewsController.getNewsArticle);
  */
 router.post('/', authenticate, adminOnly, createNewsValidator, validate, NewsController.createNews);
 
+/**
+ * @swagger
+ * /news/{id}:
+ *   put:
+ *     summary: Update news article (Admin only)
+ *     tags: [News]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: News article ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               summary:
+ *                 type: string
+ *               imageUrl:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *                 enum: [policy, technology, success-stories, events, global-trends]
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               source:
+ *                 type: string
+ *               sourceUrl:
+ *                 type: string
+ *               featured:
+ *                 type: boolean
+ *               status:
+ *                 type: string
+ *                 enum: [draft, published]
+ *     responses:
+ *       200:
+ *         description: News article updated successfully
+ *       404:
+ *         description: News article not found
+ */
+router.put('/:id', authenticate, adminOnly, NewsController.updateNews);
+
+/**
+ * @swagger
+ * /news/{id}:
+ *   delete:
+ *     summary: Delete news article (Admin only)
+ *     tags: [News]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: News article ID
+ *     responses:
+ *       200:
+ *         description: News article deleted successfully
+ *       404:
+ *         description: News article not found
+ */
+router.delete('/:id', authenticate, adminOnly, NewsController.deleteNews);
+
 export default router;
